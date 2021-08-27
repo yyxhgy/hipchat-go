@@ -161,9 +161,13 @@ func (u *UserService) GetPrivateChatMessage(messageId, id string) (*Message, *ht
 	return message, resp, err
 }
 
-func (u *UserService) GetPrivateChatHistory(id string) ([]Message, *http.Response, error) {
+type Items struct {
+	Items []Message `json:"items"`
+}
+
+func (u *UserService) GetPrivateChatHistory(id string) (Items, *http.Response, error) {
+	var items Items
 	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history", id), nil, nil)
-	var messages []Message
-	resp, err := u.client.Do(req, &messages)
-	return messages, resp, err
+	resp, err := u.client.Do(req, &items)
+	return items, resp, err
 }
