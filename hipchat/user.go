@@ -154,9 +154,14 @@ func (u *UserService) Update(id string, user *UpdateUserRequest) (*http.Response
 	return u.client.Do(req, nil)
 }
 
-func (u *UserService) GetPrivateChatMessage(messageId, id string) (*Message, *http.Response, error) {
+type PrivateChatMessage struct {
+	Message
+	Color string `json:"color"`
+}
+
+func (u *UserService) GetPrivateChatMessage(messageId, id string) (*PrivateChatMessage, *http.Response, error) {
 	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history/%s", id, messageId), nil, nil)
-	message := new(Message)
+	message := new(PrivateChatMessage)
 	resp, err := u.client.Do(req, &message)
 	return message, resp, err
 }
@@ -165,9 +170,20 @@ type Items struct {
 	Items []Message `json:"items"`
 }
 
-func (u *UserService) GetPrivateChatHistory(id string) (Items, *http.Response, error) {
+func (u *UserService) GetPrivateChatHistory(id string, maxResults int) (Items, *http.Response, error) {
 	var items Items
-	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history", id), nil, nil)
+	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history", id), struct {
+		MaxResults int `json:"max-results"`
+	}{maxResults}, nil)
+	resp, err := u.client.Do(req, &items)
+	return items, resp, err
+}
+
+func (u *UserService) GetRecentPrivateChatHistory(id string, maxResults int) (Items, *http.Response, error) {
+	var items Items
+	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history/latest", id), struct {
+		MaxResults int `json:"max-results"`
+	}{maxResults}, nil)
 	resp, err := u.client.Do(req, &items)
 	return items, resp, err
 }
