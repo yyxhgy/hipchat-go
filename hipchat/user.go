@@ -153,3 +153,10 @@ func (u *UserService) Update(id string, user *UpdateUserRequest) (*http.Response
 
 	return u.client.Do(req, nil)
 }
+
+func (u *UserService) GetPrivateChatMessage(messageId, id string) (*Message, *http.Response, error) {
+	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history/%s", id, messageId), nil, nil)
+	message := new(Message)
+	resp, err := u.client.Do(req, &message)
+	return message, resp, err
+}
