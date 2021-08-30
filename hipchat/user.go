@@ -170,20 +170,16 @@ type Items struct {
 	Items []Message `json:"items"`
 }
 
-func (u *UserService) GetPrivateChatHistory(id string, maxResults int) (Items, *http.Response, error) {
+func (u *UserService) GetPrivateChatHistory(id string, opt HistoryOptions) (Items, *http.Response, error) {
 	var items Items
-	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history", id), struct {
-		MaxResults int `url:"max-results,omitempty"`
-	}{maxResults}, nil)
+	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history", id), opt, nil)
 	resp, err := u.client.Do(req, &items)
 	return items, resp, err
 }
 
-func (u *UserService) GetRecentPrivateChatHistory(id string, maxResults int) (Items, *http.Response, error) {
+func (u *UserService) GetRecentPrivateChatHistory(id string, opt *LatestHistoryOptions) (Items, *http.Response, error) {
 	var items Items
-	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history/latest", id), struct {
-		MaxResults int `url:"max-results,omitempty"`
-	}{maxResults}, nil)
+	req, err := u.client.NewRequest("GET", fmt.Sprintf("user/%s/history/latest", id), opt, nil)
 	resp, err := u.client.Do(req, &items)
 	return items, resp, err
 }
